@@ -1,4 +1,4 @@
-package com.example.smartapp_programming_project
+package com.example.myapplication
 
 import org.junit.Test
 

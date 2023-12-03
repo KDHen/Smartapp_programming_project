@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Smartapp_programming_project"
+rootProject.name = "My Application"
 include(":app")
  
