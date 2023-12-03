@@ -1,6 +1,8 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -23,7 +25,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,11 +40,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
@@ -53,13 +57,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainView(viewModel)
+            MainView(viewModel, this)
         }
     }
 }
 
 @Composable
-fun MainView(viewModel: SongViewModel) {
+fun MainView(viewModel: SongViewModel, activity: ComponentActivity) {
     val songList = viewModel.songList.observeAsState(emptyList())
 
     MyApplicationTheme {
@@ -73,7 +77,7 @@ fun MainView(viewModel: SongViewModel) {
                 verticalArrangement = Arrangement.Top
             ) {
                 TopAppBar()
-                ListenAgainBar()
+                ListenAgainBar(activity)
                 SongList(songList.value)
             }
         }
@@ -82,24 +86,38 @@ fun MainView(viewModel: SongViewModel) {
 
 @Composable
 fun TopAppBar() {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Image(
-            painter = painterResource(id = R.drawable.youtubemusic100),
-            contentDescription = "App logo",
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        IconButton(
+            onClick = { /* 아이콘 버튼 클릭 시 수행할 동작 */ },
             modifier = Modifier
-                .size(85.dp)
-                .padding(16.dp)
-        )
+                .padding(8.dp)
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.youtubemusic100),
+                contentDescription = "App logo",
+                modifier = Modifier
+                    .size(85.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
 
         Spacer(Modifier.weight(1f))
 
-        Image(
-            painter = painterResource(id = R.drawable.search50),
-            contentDescription = "Search icon",
+        IconButton(
+            onClick = {},
             modifier = Modifier
                 .size(55.dp)
                 .padding(16.dp)
-        )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.search50),
+                contentDescription = "Search icon",
+                tint = Color.White
+            )
+        }
         // Glide를 통해 동적으로 사용자 아이콘 로드
 //        val imageUrl = /* 사용자 이미지 URL */
 //            Glide.with(this)
@@ -110,7 +128,7 @@ fun TopAppBar() {
 }
 
 @Composable
-fun ListenAgainBar() {
+fun ListenAgainBar(activity: ComponentActivity) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -122,7 +140,10 @@ fun ListenAgainBar() {
 //        )
         Text(text = "다시 듣기", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Button(
-            onClick = {},
+            onClick = {
+                val intent = Intent(activity, SeeMoreActivity::class.java)
+                activity.startActivity(intent)
+                      },
             modifier = Modifier
                 .height(30.dp)
                 .wrapContentSize(),
@@ -144,7 +165,7 @@ fun SongList(list: List<Song>) {
         items(list.take(20).chunked(2)) { songs ->
             Column {
                 for (song in songs) {
-                    SongRow(song)
+                    Song(song)
                 }
             }
         }
@@ -152,7 +173,7 @@ fun SongList(list: List<Song>) {
 }
 
 @Composable
-fun SongRow(song: Song) {
+fun Song(song: Song) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier.clickable { expanded = !expanded },
@@ -190,3 +211,54 @@ fun SongRow(song: Song) {
 fun TextTitle(title: String) {
     Text(title, fontSize = 30.sp)
 }
+
+//@Composable
+//fun SeemoreSongList(list: List<Song>) {
+//    LazyColumn(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(8.dp)
+//    ) {
+//        items(list.take(20).chunked(2)) { songs ->
+//            Row{
+//                for(song in songs)
+//                    MusicItem(song)
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//fun MusicItem(song: Song) {
+//    var expanded by remember { mutableStateOf(false) }
+//
+//    Card(
+//        modifier = Modifier.clickable { expanded = !expanded },
+//        elevation = CardDefaults.cardElevation(8.dp)
+//    ) {
+//        // 각 음악 항목의 UI를 작성
+//        Row(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(8.dp),
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            AsyncImage(
+//                model = "https://picsum.photos/200/300?random",
+//                contentDescription = "노래 앨범 사진",
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//                    .size(100.dp)
+////                .clip(CircleShape)
+//                    .clip(RoundedCornerShape(percent = 10))
+//            )
+//
+//            Spacer(modifier = Modifier.width(16.dp))
+//
+//            Column {
+//                Text(text = song.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+//                Text(text = song.artist, fontSize = 14.sp)
+//            }
+//        }
+//    }
+//}

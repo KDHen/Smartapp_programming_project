@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="title_activity_see_more">SeeMoreActivity</string>
+    <string name="title_activity_another">another</string>
 </resources>
