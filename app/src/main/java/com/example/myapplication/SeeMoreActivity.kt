@@ -6,18 +6,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -84,7 +90,6 @@ fun SeeMoreTopBar(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // 뒤로가기 버튼
         IconButton(
             onClick = {
                 (context as? Activity)?.finish()
@@ -103,7 +108,6 @@ fun SeeMoreTopBar(modifier: Modifier = Modifier) {
             )
         }
 
-        // 다시듣기 텍스트
         Text(
             text = "다시 듣기",
             fontSize = 20.sp,
@@ -120,7 +124,7 @@ fun SeeMoreTopBar(modifier: Modifier = Modifier) {
                 .padding(8.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.search50), // 검색 아이콘의 리소스 ID
+                painter = painterResource(id = R.drawable.search50),
                 contentDescription = "Search Icon",
                 tint = Color.White
             )
@@ -141,50 +145,39 @@ fun SeeMoreTopBar(modifier: Modifier = Modifier) {
 
 @Composable
 fun SeemoreSongList(list: List<Song>) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(list.take(5).chunked(2)) { songs ->
-            Row{
-                for(song in songs)
-                    MusicItem(song)
-            }
+        items(list) { item ->
+            MusicItem(item)
         }
     }
 }
 
 @Composable
 fun MusicItem(song: Song) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier.clickable { expanded = !expanded },
-        elevation = CardDefaults.cardElevation(8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
     ) {
-        // 각 음악 항목의 UI를 작성
-        Row(
+        AsyncImage(
+            model = "https://picsum.photos/200/300?random",
+            contentDescription = "노래 앨범 사진",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                model = "https://picsum.photos/200/300?random",
-                contentDescription = "노래 앨범 사진",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(percent = 10))
-            )
+                .fillMaxWidth(1f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(percent = 2))
+        )
 
-            Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(4.dp))
 
-            Column {
-                song.title?.let { Text(text = it, fontSize = 16.sp, fontWeight = FontWeight.Bold) }
-                song.artist?.let { Text(text = it, fontSize = 14.sp) }
-            }
+        Column {
+            song.title?.let { Text(text = it, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White) }
+            song.artist?.let { Text(text = it, fontSize = 14.sp, color = Color.White) }
         }
     }
 }

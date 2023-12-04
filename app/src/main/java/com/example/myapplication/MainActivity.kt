@@ -8,12 +8,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -46,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
@@ -65,20 +70,24 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainView(viewModel: SongViewModel, activity: ComponentActivity) {
     val songList = viewModel.songList.observeAsState(emptyList())
+    val list = listOf("운동", "행복한 기분", "에너지 충전", "출퇴근 길", "휴식", "집중", "슬픔", "로맨스", "파티", "잠잘때")
 
     MyApplicationTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.Black
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                TopAppBar()
-                ListenAgainBar(activity)
-                SongList(songList.value)
+                item{TopAppBar()}
+                item{RecommendedList(list)}
+                item{fastsonglistBar()}
+                item{fastSongList(songList.value)}
+                item{ListenAgainBar(activity)}
+                item{SongList(songList.value)}
             }
         }
     }
@@ -128,6 +137,104 @@ fun TopAppBar() {
 }
 
 @Composable
+fun RecommendedList(list: List<String>) {
+    LazyRow(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items(list) { item ->
+            Recommendedbutton(item)
+        }
+    }
+}
+
+@Composable
+fun Recommendedbutton(item: String) {
+    Button(
+        onClick = { /* 아이콘 버튼 클릭 시 수행할 동작 */ },
+        modifier = Modifier
+            .padding(8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray.copy(alpha = 0.9f), contentColor = Color.White), // 버튼의 배경색과 글씨색 설정
+        shape = RoundedCornerShape(6.dp) // 버튼의 모양 설정
+    ) {
+        Text(text = item, fontSize = 12.sp)
+    }
+}
+
+@Composable
+fun fastsonglistBar() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ){
+        Text(text = "빠른 선곡", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        Button(
+            onClick = {},
+            modifier = Modifier
+                .height(30.dp)
+                .wrapContentSize(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
+            contentPadding = PaddingValues(1.dp),
+            border = BorderStroke(1.dp, Color.White)
+        ){
+            Text(text = "모두 재생", fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+fun fastSongList(list: List<Song>) {
+    LazyRow {
+        items(list.take(20).chunked(4)) { songs ->
+            Column {
+                for (song in songs) {
+                    fastSong(song)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun fastSong(song: Song) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .width(400.dp)
+            .padding(8.dp)
+            .background(Color.DarkGray)
+            .clickable { expanded = !expanded },
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Row (
+            modifier = Modifier
+                .padding(8.dp)
+                .height(IntrinsicSize.Min)
+        ){
+            AsyncImage(
+                model = "https://picsum.photos/200/300?random",
+                contentDescription = "노래 앨범 사진",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(55.dp)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(percent = 2))
+            )
+            Spacer(modifier = Modifier.width(2.dp))
+            Column(
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                song.title?.let { Text(text = it, color = Color.White) }
+                song.artist?.let { Text(text = it, color = Color.White) }
+            }
+        }
+    }
+}
+
+@Composable
 fun ListenAgainBar(activity: ComponentActivity) {
     Row(
         modifier = Modifier
@@ -135,9 +242,6 @@ fun ListenAgainBar(activity: ComponentActivity) {
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ){
-//        Image(
-//
-//        )
         Text(text = "다시 듣기", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
         Button(
             onClick = {
@@ -149,7 +253,7 @@ fun ListenAgainBar(activity: ComponentActivity) {
                 .wrapContentSize(),
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
             contentPadding = PaddingValues(1.dp),
-            border = BorderStroke(1.dp, Color.White),
+            border = BorderStroke(1.dp, Color.White)
 //            elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 2.dp),
 //            shape = CircleShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 16.dp, bottomStart = 16.dp)
 //                    RoundedCornerShape(8.dp)
@@ -174,91 +278,24 @@ fun SongList(list: List<Song>) {
 
 @Composable
 fun Song(song: Song) {
-    var expanded by remember { mutableStateOf(false) }
-    Card(
-        modifier = Modifier.clickable { expanded = !expanded },
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column (
+    Column (
+        modifier = Modifier
+            .width(150.dp)
+            .padding(8.dp)
+    ){
+        AsyncImage(
+            model = "https://picsum.photos/200/300?random",
+            contentDescription = "노래 앨범 사진",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .width(100.dp)
-                .padding(8.dp)
-        ){
-            AsyncImage(
-                model = "https://picsum.photos/200/300?random",
-                contentDescription = "노래 앨범 사진",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(100.dp)
-//                .clip(CircleShape)
-                    .clip(RoundedCornerShape(percent = 10))
-            )
-//            Spacer(modifier = Modifier.width(10.dp))
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxSize(),
-////                .background((Color(0, 210, 210))),
-//                verticalArrangement = Arrangement.SpaceAround
-////                .padding(16.dp)
-//            ) {
-//                TextTitle(song.title)
-//            }
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(percent = 2))
+        )
+        Spacer(modifier = Modifier.width(2.dp))
+        Column(
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
+            song.title?.let { Text(text = it, color = Color.White) }
         }
     }
 }
-
-@Composable
-fun TextTitle(title: String) {
-    Text(title, fontSize = 30.sp)
-}
-
-//@Composable
-//fun SeemoreSongList(list: List<Song>) {
-//    LazyColumn(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(8.dp)
-//    ) {
-//        items(list.take(20).chunked(2)) { songs ->
-//            Row{
-//                for(song in songs)
-//                    MusicItem(song)
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun MusicItem(song: Song) {
-//    var expanded by remember { mutableStateOf(false) }
-//
-//    Card(
-//        modifier = Modifier.clickable { expanded = !expanded },
-//        elevation = CardDefaults.cardElevation(8.dp)
-//    ) {
-//        // 각 음악 항목의 UI를 작성
-//        Row(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(8.dp),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            AsyncImage(
-//                model = "https://picsum.photos/200/300?random",
-//                contentDescription = "노래 앨범 사진",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier
-//                    .size(100.dp)
-////                .clip(CircleShape)
-//                    .clip(RoundedCornerShape(percent = 10))
-//            )
-//
-//            Spacer(modifier = Modifier.width(16.dp))
-//
-//            Column {
-//                Text(text = song.title, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-//                Text(text = song.artist, fontSize = 14.sp)
-//            }
-//        }
-//    }
-//}
