@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,8 +62,7 @@ fun TopBarUI(navController: NavController) {
 @Composable
 fun ImageUI(song: Song?) {
     AsyncImage(
-        model = "https://picsum.photos/200/300?random",
-//        model = song?.imageUrl, // imageUrl은 Song 객체의 이미지 URL을 나타냅니다.
+        model = song?.image_url,
         contentDescription = "노래 앨범 사진",
         contentScale = ContentScale.Crop,
         modifier = Modifier
@@ -82,7 +83,7 @@ fun TextUI(song: Song?) {
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )) }
-        song?.artist?.let { Text(text = it, color = Color.White) }
+        song?.singer?.let { Text(text = it, color = Color.White) }
     }
 
 }
@@ -107,13 +108,16 @@ fun lyricsBar(song: Song?) {
                         fontWeight = FontWeight.Bold
                     ))
                 Spacer(Modifier.padding(10.dp))
+
                 Text(
                     text = song?.lyrics ?: "",
                     style = TextStyle(
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     ),
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp)
+                        .verticalScroll(rememberScrollState())
                 )
             }
         },

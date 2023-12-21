@@ -99,12 +99,6 @@ fun TopAppBar() {
                 tint = Color.White
             )
         }
-        // Glide를 통해 동적으로 사용자 아이콘 로드
-//        val imageUrl = /* 사용자 이미지 URL */
-//            Glide.with(this)
-//                .load(imageUrl)
-//                .apply(RequestOptions().circleCrop())
-//                .into(userIcon)
     }
 }
 
@@ -171,8 +165,6 @@ fun fastSongList(navController: NavController, list: List<Song>) {
 
 @Composable
 fun fastSong(navController: NavController, song: Song) {
-//    var expanded by remember { mutableStateOf(false) }
-
     Card(
         modifier = Modifier
             .width(400.dp)
@@ -188,8 +180,7 @@ fun fastSong(navController: NavController, song: Song) {
                 .height(IntrinsicSize.Min)
         ){
             AsyncImage(
-                model = "https://picsum.photos/200/300?random",
-                //            model = song?.imageUrl,
+                model = song?.image_url,
                 contentDescription = "노래 앨범 사진",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -202,7 +193,7 @@ fun fastSong(navController: NavController, song: Song) {
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
                 song.title?.let { Text(text = it, color = Color.White) }
-                song.artist?.let { Text(text = it, color = Color.White) }
+                song.singer?.let { Text(text = it, color = Color.White) }
             }
         }
     }
@@ -227,9 +218,6 @@ fun ListenAgainBar(navController: NavController, activity: ComponentActivity) {
             colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White),
             contentPadding = PaddingValues(1.dp),
             border = BorderStroke(1.dp, Color.White)
-//            elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 2.dp),
-//            shape = CircleShape(topStart = 16.dp, topEnd = 16.dp, bottomEnd = 16.dp, bottomStart = 16.dp)
-//                    RoundedCornerShape(8.dp)
         ){
             Text(text = "더보기", fontSize = 12.sp)
         }
@@ -260,8 +248,7 @@ fun Song(navController: NavController, song: Song) {
             }
     ){
         AsyncImage(
-            model = "https://picsum.photos/200/300?random",
-            //            model = song?.imageUrl,
+            model = song?.image_url,
             contentDescription = "노래 앨범 사진",
             contentScale = ContentScale.Crop,
             modifier = Modifier

@@ -3,7 +3,7 @@ package com.example.myapplication
 data class Song(
     val id: Int?,
     val title: String?,
-    val artist: String?,
-    val albumCoverUrl: String?,
+    val singer: String?,
+    val image_url: String?,
     val lyrics: String?
 )

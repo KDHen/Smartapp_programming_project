@@ -43,7 +43,6 @@ fun SeeMoreMainView(navController: NavController, viewModel: SongViewModel) {
     val songList = viewModel.songList.observeAsState(emptyList())
 
     MyApplicationTheme {
-        // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = Color.Black
@@ -130,8 +129,7 @@ fun MusicItem(navController: NavController, song: Song) {
             }
     ) {
         AsyncImage(
-            model = "https://picsum.photos/200/300?random",
-//            model = song?.imageUrl,
+            model = song?.image_url,
             contentDescription = "노래 앨범 사진",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -144,7 +142,7 @@ fun MusicItem(navController: NavController, song: Song) {
 
         Column {
             song.title?.let { Text(text = it, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White) }
-            song.artist?.let { Text(text = it, fontSize = 14.sp, color = Color.White) }
+            song.singer?.let { Text(text = it, fontSize = 14.sp, color = Color.White) }
         }
     }
 }
